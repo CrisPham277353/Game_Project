@@ -1,6 +1,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <SDL_image.h> // Thêm thư viện SDL_image
+#include <SDL_image.h> 
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -15,10 +15,10 @@ const int BOARD_HEIGHT = 20;
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 TTF_Font* font = nullptr;
-SDL_Texture* menuBackgroundTexture = nullptr; // Texture cho hình nền menu
+SDL_Texture* menuBackgroundTexture = nullptr; 
 bool running = true;
 
-// Game states
+
 enum GameState {
     MENU,
     PLAYING,
@@ -28,7 +28,7 @@ enum GameState {
 
 GameState currentState = MENU;
 
-// Menu options
+
 enum MenuOption {
     START_GAME,
     QUIT,
@@ -37,12 +37,12 @@ enum MenuOption {
 
 MenuOption selectedOption = START_GAME;
 
-// Game variables
+
 int score = 0;
 int level = 1;
 int linesCleared = 0;
 
-// Tetromino shapes
+
 const int tetromino[7][4] = {
     {1, 3, 5, 7}, // I
     {2, 4, 5, 7}, // Z
@@ -62,18 +62,18 @@ int board[BOARD_HEIGHT][BOARD_WIDTH] = {};
 int colorIndex = 1;
 
 bool LoadFont() {
-    // Try to load different fonts in order of preference
+    
     const char* fontPaths[] = {
-        "arial.ttf",                                         // Local directory
-        "fonts/arial.ttf",                                   // Local fonts directory
-        "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf", // Linux - MS fonts
-        "/usr/share/fonts/TTF/arial.ttf",                    // Linux - Some distros
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",   // Linux - DejaVu
-        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",   // Linux - Free fonts
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", // Linux - Liberation
-        "C:/Windows/Fonts/arial.ttf",                        // Windows
-        "/Library/Fonts/Arial.ttf",                          // macOS
-        "/System/Library/Fonts/SFNSDisplay.ttf"              // macOS - San Francisco
+        "arial.ttf",                                         
+        "fonts/arial.ttf",                                   
+        "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf", 
+        "/usr/share/fonts/TTF/arial.ttf",                    
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",   
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",   
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 
+        "C:/Windows/Fonts/arial.ttf",                        
+        "/Library/Fonts/Arial.ttf",                          
+        "/System/Library/Fonts/SFNSDisplay.ttf"              
     };
     const int numPaths = sizeof(fontPaths) / sizeof(fontPaths[0]);
 
@@ -89,9 +89,9 @@ bool LoadFont() {
     return false;
 }
 
-// Hàm tải hình ảnh làm background cho menu
+
 bool LoadMenuBackground() {
-    // Danh sách các đường dẫn có thể cho hình ảnh
+   
     const char* imagePaths = "/home/cris-pham/Dev/Project_VSC/Game_Project/background.png";
 
     const int numPaths = sizeof(imagePaths) / sizeof(imagePaths[0]);
@@ -116,17 +116,17 @@ bool LoadMenuBackground() {
 void Init() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-    IMG_Init(IMG_INIT_PNG); // Khởi tạo SDL_image với hỗ trợ PNG
+    IMG_Init(IMG_INIT_PNG); 
 
     window = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Try to load a font
+    
     if (!LoadFont()) {
         std::cout << "Warning: No font loaded. Text won't be displayed." << std::endl;
     }
 
-    // Tải hình ảnh làm background cho menu
+    
     LoadMenuBackground();
 
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -140,7 +140,7 @@ void Quit() {
         SDL_DestroyTexture(menuBackgroundTexture);
     }
     TTF_Quit();
-    IMG_Quit(); // Đóng SDL_image
+    IMG_Quit(); 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -177,11 +177,11 @@ void DrawBlock(int x, int y, int color) {
     SDL_RenderFillRect(renderer, &rect);
 }
 
-// Forward declaration
+
 void SpawnTetromino();
 
 void ResetGame() {
-    // Clear the board
+    
     for (int i = 0; i < BOARD_HEIGHT; ++i) {
         for (int j = 0; j < BOARD_WIDTH; ++j) {
             board[i][j] = 0;
@@ -258,11 +258,11 @@ void HardDrop() {
             current[i].y += 1;
         }
     }
-    // Move back one step
+    
     for (int i = 0; i < 4; ++i) {
         current[i] = backup[i];
     }
-    // Lock the piece
+    
     for (int i = 0; i < 4; ++i) {
         board[current[i].y][current[i].x] = colorIndex;
     }
@@ -291,17 +291,17 @@ void ClearLines() {
         }
     }
 
-    // Update score based on lines cleared
+    
     if (linesCleared > 0) {
-        // Classic Tetris scoring
+        
         switch (linesCleared) {
         case 1: score += 100 * level; break;
         case 2: score += 300 * level; break;
         case 3: score += 500 * level; break;
-        case 4: score += 800 * level; break; // Tetris!
+        case 4: score += 800 * level; break; !
         }
 
-        // Update total lines and level
+        
         ::linesCleared += linesCleared;
         level = 1 + (::linesCleared / 10);
     }
@@ -410,25 +410,21 @@ void HandleInput(SDL_Event& e) {
 }
 
 void DrawMenu() {
-    // Nếu đã tải được hình ảnh menu, sử dụng nó làm background
+    
     if (menuBackgroundTexture) {
         SDL_RenderCopy(renderer, menuBackgroundTexture, NULL, NULL);
     }
     else {
-        // Nếu không có hình ảnh, sử dụng màu nền đen
+        
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
     }
 
-    // Vẽ các tùy chọn menu
+    
     if (font) {
-        // Nếu có sẵn font, vẽ văn bản
+        
         SDL_Color titleColor = { 255, 255, 255, 255 };
 
-        // Vẽ tiêu đề game
-        //DrawText("TETRIS", SCREEN_WIDTH / 2 - 60, 200, titleColor);
-
-        // Vẽ các tùy chọn menu - Đã điều chỉnh vị trí lên cao hơn
         for (int i = 0; i < MENU_OPTION_COUNT; ++i) {
             SDL_Color textColor = (i == selectedOption) ? SDL_Color{ 255, 255, 0, 255 } : SDL_Color{ 200, 200, 200, 255 };
             std::string optionText;
@@ -438,13 +434,10 @@ void DrawMenu() {
             case QUIT: optionText = "Quit"; break;
             }
 
-            // Đặt các tùy chọn menu cao hơn (thay đổi từ 580 xuống 400)
             DrawText(optionText, SCREEN_WIDTH / 2 - 80, 400 + i * 60, textColor);
         }
     }
     else {
-        // Fallback khi không có font - vẽ hình chữ nhật có màu cho các tùy chọn menu
-        // Cập nhật vị trí cho phù hợp với vị trí mới của văn bản
         for (int i = 0; i < MENU_OPTION_COUNT; ++i) {
             SDL_Rect optionRect = { SCREEN_WIDTH / 2 - 100, 400 + i * 60, 200, 40 };
 
@@ -464,19 +457,17 @@ void DrawGame() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // Draw board
+    
     for (int i = 0; i < BOARD_HEIGHT; ++i) {
         for (int j = 0; j < BOARD_WIDTH; ++j) {
             if (board[i][j]) DrawBlock(j, i, board[i][j]);
         }
     }
 
-    // Draw current tetromino
     for (int i = 0; i < 4; ++i) {
         DrawBlock(current[i].x, current[i].y, colorIndex);
     }
 
-    // Draw grid
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
     for (int i = 0; i <= BOARD_HEIGHT; ++i) {
         SDL_RenderDrawLine(renderer, 0, i * BLOCK_SIZE, BOARD_WIDTH * BLOCK_SIZE, i * BLOCK_SIZE);
@@ -485,7 +476,6 @@ void DrawGame() {
         SDL_RenderDrawLine(renderer, j * BLOCK_SIZE, 0, j * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE);
     }
 
-    // Draw score and level
     if (font) {
         SDL_Color textColor = { 255, 255, 255, 255 };
         DrawText("Score: " + std::to_string(score), SCREEN_WIDTH - 180, 20, textColor);
@@ -494,9 +484,8 @@ void DrawGame() {
 }
 
 void DrawPaused() {
-    DrawGame(); // Draw game in background
+    DrawGame(); 
 
-    // Semi-transparent overlay
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
     SDL_Rect overlay = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &overlay);
@@ -508,7 +497,6 @@ void DrawPaused() {
         DrawText("Press ESC for menu", SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2 + 70, textColor);
     }
     else {
-        // Fallback visual indicator for PAUSED
         SDL_Rect pauseRect = { SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 - 30, 160, 60 };
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &pauseRect);
@@ -516,9 +504,8 @@ void DrawPaused() {
 }
 
 void DrawGameOver() {
-    DrawGame(); // Draw game in background
+    DrawGame();
 
-    // Semi-transparent overlay
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
     SDL_Rect overlay = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
     SDL_RenderFillRect(renderer, &overlay);
@@ -532,7 +519,6 @@ void DrawGameOver() {
         DrawText("Press ENTER to continue", SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 70, scoreColor);
     }
     else {
-        // Fallback visual indicator for GAME OVER
         SDL_Rect gameOverRect = { SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 30, 200, 60 };
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &gameOverRect);
@@ -562,7 +548,7 @@ int main(int argc, char* argv[]) {
     Init();
 
     Uint32 lastTick = SDL_GetTicks();
-    Uint32 dropInterval = 500; // ms - will decrease with level
+    Uint32 dropInterval = 500; 
 
     while (running) {
         SDL_Event e;
@@ -570,9 +556,8 @@ int main(int argc, char* argv[]) {
 
         if (currentState == PLAYING) {
             Uint32 now = SDL_GetTicks();
-            // Decrease interval as level increases
             dropInterval = 500 - (level - 1) * 25;
-            if (dropInterval < 100) dropInterval = 100; // Minimum speed cap
+            if (dropInterval < 100) dropInterval = 100;
 
             if (now - lastTick > dropInterval) {
                 Drop();
@@ -582,7 +567,7 @@ int main(int argc, char* argv[]) {
         }
 
         Draw();
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
     Quit();
