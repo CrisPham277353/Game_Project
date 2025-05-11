@@ -1,5 +1,6 @@
-﻿#include <SDL.h>
+#include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h> // Thêm thư viện SDL_image
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -14,6 +15,7 @@ const int BOARD_HEIGHT = 20;
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 TTF_Font* font = nullptr;
+SDL_Texture* menuBackgroundTexture = nullptr; // Texture cho hình nền menu
 bool running = true;
 
 // Game states
@@ -73,7 +75,6 @@ bool LoadFont() {
         "/Library/Fonts/Arial.ttf",                          // macOS
         "/System/Library/Fonts/SFNSDisplay.ttf"              // macOS - San Francisco
     };
-
     const int numPaths = sizeof(fontPaths) / sizeof(fontPaths[0]);
 
     for (int i = 0; i < numPaths; i++) {
@@ -88,9 +89,35 @@ bool LoadFont() {
     return false;
 }
 
+// Hàm tải hình ảnh làm background cho menu
+bool LoadMenuBackground() {
+    // Danh sách các đường dẫn có thể cho hình ảnh
+    const char* imagePaths = "/home/cris-pham/Dev/Project_VSC/Game_Project/background.png";
+
+    const int numPaths = sizeof(imagePaths) / sizeof(imagePaths[0]);
+
+    for (int i = 0; i < numPaths; i++) {
+        SDL_Surface* loadedSurface = IMG_Load(imagePaths);
+        if (loadedSurface != NULL) {
+            menuBackgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+            SDL_FreeSurface(loadedSurface);
+
+            if (menuBackgroundTexture != NULL) {
+                std::cout << "Successfully loaded background image: " << imagePaths[i] << std::endl;
+                return true;
+            }
+        }
+    }
+
+    std::cout << "Failed to load background image. Using default background." << std::endl;
+    return false;
+}
+
 void Init() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
+    IMG_Init(IMG_INIT_PNG); // Khởi tạo SDL_image với hỗ trợ PNG
+
     window = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -99,6 +126,9 @@ void Init() {
         std::cout << "Warning: No font loaded. Text won't be displayed." << std::endl;
     }
 
+    // Tải hình ảnh làm background cho menu
+    LoadMenuBackground();
+
     srand(static_cast<unsigned int>(time(nullptr)));
 }
 
@@ -106,7 +136,11 @@ void Quit() {
     if (font) {
         TTF_CloseFont(font);
     }
+    if (menuBackgroundTexture) {
+        SDL_DestroyTexture(menuBackgroundTexture);
+    }
     TTF_Quit();
+    IMG_Quit(); // Đóng SDL_image
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -376,15 +410,25 @@ void HandleInput(SDL_Event& e) {
 }
 
 void DrawMenu() {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    // Nếu đã tải được hình ảnh menu, sử dụng nó làm background
+    if (menuBackgroundTexture) {
+        SDL_RenderCopy(renderer, menuBackgroundTexture, NULL, NULL);
+    }
+    else {
+        // Nếu không có hình ảnh, sử dụng màu nền đen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+    }
 
-    // Draw title even if no font is available
+    // Vẽ các tùy chọn menu
     if (font) {
+        // Nếu có sẵn font, vẽ văn bản
         SDL_Color titleColor = { 255, 255, 255, 255 };
-        DrawText("TETRIS", SCREEN_WIDTH / 2 - 60, 150, titleColor);
 
-        // Draw menu options
+        // Vẽ tiêu đề game
+        //DrawText("TETRIS", SCREEN_WIDTH / 2 - 60, 200, titleColor);
+
+        // Vẽ các tùy chọn menu - Đã điều chỉnh vị trí lên cao hơn
         for (int i = 0; i < MENU_OPTION_COUNT; ++i) {
             SDL_Color textColor = (i == selectedOption) ? SDL_Color{ 255, 255, 0, 255 } : SDL_Color{ 200, 200, 200, 255 };
             std::string optionText;
@@ -394,25 +438,15 @@ void DrawMenu() {
             case QUIT: optionText = "Quit"; break;
             }
 
-            DrawText(optionText, SCREEN_WIDTH / 2 - 80, 300 + i * 60, textColor);
+            // Đặt các tùy chọn menu cao hơn (thay đổi từ 580 xuống 400)
+            DrawText(optionText, SCREEN_WIDTH / 2 - 80, 400 + i * 60, textColor);
         }
-
-        // Draw controls
-        SDL_Color controlsColor = { 150, 150, 150, 255 };
-        DrawText("Controls:", 50, 550, controlsColor);
-        DrawText("Arrow Keys - Move/Rotate", 50, 590, controlsColor);
-        DrawText("Space - Hard Drop", 50, 630, controlsColor);
-        DrawText("P - Pause", 50, 670, controlsColor);
-        DrawText("ESC - Menu", 50, 710, controlsColor);
     }
     else {
-        // Fallback for when no font is available - draw colored rectangles for menu options
-        SDL_Rect titleRect = { SCREEN_WIDTH / 2 - 100, 150, 200, 40 };
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &titleRect);
-
+        // Fallback khi không có font - vẽ hình chữ nhật có màu cho các tùy chọn menu
+        // Cập nhật vị trí cho phù hợp với vị trí mới của văn bản
         for (int i = 0; i < MENU_OPTION_COUNT; ++i) {
-            SDL_Rect optionRect = { SCREEN_WIDTH / 2 - 100, 300 + i * 60, 200, 40 };
+            SDL_Rect optionRect = { SCREEN_WIDTH / 2 - 100, 400 + i * 60, 200, 40 };
 
             if (i == selectedOption) {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
