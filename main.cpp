@@ -5,6 +5,7 @@
 #include <vector>
 #include <ctime>
 #include <string>
+using namespace std;
 
 const int SCREEN_WIDTH = 400;
 const int SCREEN_HEIGHT = 800;
@@ -44,13 +45,13 @@ int linesCleared = 0;
 
 
 const int tetromino[7][4] = {
-    {1, 3, 5, 7}, // I
-    {2, 4, 5, 7}, // Z
-    {3, 5, 4, 6}, // S
-    {3, 5, 4, 7}, // T
-    {2, 3, 5, 7}, // L
-    {3, 5, 7, 6}, // J
-    {2, 3, 4, 5}, // O
+    {1, 3, 5, 7},
+    {2, 4, 5, 7},
+    {3, 5, 4, 6}, 
+    {3, 5, 4, 7}, 
+    {2, 3, 5, 7}, 
+    {3, 5, 7, 6}, 
+    {2, 3, 4, 5}, 
 };
 
 struct Point {
@@ -80,12 +81,12 @@ bool LoadFont() {
     for (int i = 0; i < numPaths; i++) {
         font = TTF_OpenFont(fontPaths[i], 24);
         if (font) {
-            std::cout << "Successfully loaded font: " << fontPaths[i] << std::endl;
+            cout << "Successfully loaded font: " << fontPaths[i] << endl;
             return true;
         }
     }
 
-    std::cout << "Failed to load any font: " << TTF_GetError() << std::endl;
+    cout << "Failed to load any font: " << TTF_GetError() << endl;
     return false;
 }
 
@@ -103,13 +104,13 @@ bool LoadMenuBackground() {
             SDL_FreeSurface(loadedSurface);
 
             if (menuBackgroundTexture != NULL) {
-                std::cout << "Successfully loaded background image: " << imagePaths[i] << std::endl;
+                cout << "Successfully loaded background image: " << imagePaths[i] << endl;
                 return true;
             }
         }
     }
 
-    std::cout << "Failed to load background image. Using default background." << std::endl;
+    cout << "Failed to load background image. Using default background." << endl;
     return false;
 }
 
@@ -123,7 +124,7 @@ void Init() {
 
     
     if (!LoadFont()) {
-        std::cout << "Warning: No font loaded. Text won't be displayed." << std::endl;
+        cout << "Warning: No font loaded. Text won't be displayed." << endl;
     }
 
     
@@ -146,12 +147,12 @@ void Quit() {
     SDL_Quit();
 }
 
-void DrawText(const std::string& text, int x, int y, SDL_Color color) {
+void DrawText(const string& text, int x, int y, SDL_Color color) {
     if (!font) return;
 
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
     if (!surface) {
-        std::cout << "Failed to render text: " << TTF_GetError() << std::endl;
+        cout << "Failed to render text: " << TTF_GetError() << endl;
         return;
     }
 
@@ -427,7 +428,7 @@ void DrawMenu() {
 
         for (int i = 0; i < MENU_OPTION_COUNT; ++i) {
             SDL_Color textColor = (i == selectedOption) ? SDL_Color{ 255, 255, 0, 255 } : SDL_Color{ 200, 200, 200, 255 };
-            std::string optionText;
+            string optionText;
 
             switch (i) {
             case START_GAME: optionText = "Start Game"; break;
@@ -478,8 +479,8 @@ void DrawGame() {
 
     if (font) {
         SDL_Color textColor = { 255, 255, 255, 255 };
-        DrawText("Score: " + std::to_string(score), SCREEN_WIDTH - 180, 20, textColor);
-        DrawText("Level: " + std::to_string(level), SCREEN_WIDTH - 180, 60, textColor);
+        DrawText("Score: " + to_string(score), SCREEN_WIDTH - 180, 20, textColor);
+        DrawText("Level: " + to_string(level), SCREEN_WIDTH - 180, 60, textColor);
     }
 }
 
@@ -515,7 +516,7 @@ void DrawGameOver() {
         DrawText("GAME OVER", SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 - 30, textColor);
 
         SDL_Color scoreColor = { 255, 255, 255, 255 };
-        DrawText("Final Score: " + std::to_string(score), SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 30, scoreColor);
+        DrawText("Final Score: " + to_string(score), SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 30, scoreColor);
         DrawText("Press ENTER to continue", SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 70, scoreColor);
     }
     else {
