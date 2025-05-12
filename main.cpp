@@ -299,7 +299,7 @@ void ClearLines() {
         case 1: score += 100 * level; break;
         case 2: score += 300 * level; break;
         case 3: score += 500 * level; break;
-        case 4: score += 800 * level; break; !
+        case 4: score += 800 * level; break; 
         }
 
         
